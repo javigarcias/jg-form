@@ -1,0 +1,19 @@
+{
+  "name": "jg-form",
+  "version": "1.0.0",
+  "description": "Agrega un formulario con bloque de Gutenberg nativo",
+  "main": "index.js",
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start"
+  },
+  "keywords": [],
+  "author": "Javier Garcia Sanchez",
+  "license": "ISC",
+  "devDependencies": {
+    "@wordpress/scripts": "^12.5.0"
+  },
+  "dependencies": {
+    "toml": "^3.0.0"
+  }
+}
