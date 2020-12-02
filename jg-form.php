@@ -10,6 +10,69 @@
     License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
+//Libreria CMB2 para Custom Fields
+
+if ( file_exists (dirname( __FILE__ ) . '/CMB2/init.php')) {
+    require_once dirname( __FILE__ ) . '/CMB2/init.php';
+}
+
+add_action('cmb2_admin_init', 'forms_imputs');
+
+function forms_imputs() {
+    $prefix = 'jg_forms_inputs_';
+
+    $metabox_sugerencias = new_cmb2_box(array(
+        'id'            => $prefix . 'metabox',
+        'title'         => __('Custom fields', 'cmb2'),
+        'object_types'  => array('sugerencias')
+    ));
+
+    $metabox_sugerencias->add_field(array(
+        'name'      => __('Nombre', 'cmb2'),
+        'desc'      => __('Escribe tu nombre', 'cmb2'),
+        'id'        => $prefix . 'nombre',
+        'type'      => 'text',
+    ));
+    $metabox_sugerencias->add_field(array(
+        'name'      => __('Apellidos', 'cmb2'),
+        'desc'      => __('Escribe tus apellidos', 'cmb2'),
+        'id'        => $prefix . 'apellidos',
+        'type'      => 'text',
+    ));
+    $metabox_sugerencias->add_field(array(
+        'name'      => __('Email', 'cmb2'),
+        'desc'      => __('Escribe tu email', 'cmb2'),
+        'id'        => $prefix . 'email',
+        'type'      => 'text_email',
+    ));
+    $metabox_sugerencias->add_field(array(
+        'name'      => __('Sugerencia', 'cmb2'),
+        'desc'      => __('Indica tu sugerencia', 'cmb2'),
+        'id'        => $prefix . 'sugerencia',
+        'type'      => 'textarea',
+    ));
+
+}
+
+//Imprimir Datos
+
+function jg_suggestion($texto) {
+    $args =array(
+        'post_type'     => 'sugerencias',
+        'order'         => 'ASC',
+        'post_per_page' => -1,
+    );
+}
+
+//Crear shortcode > [jg_send_suggestion_shortcode]
+function jg_send_form_suggestion() {
+    echo "Holaaaa desde shortcode";
+}
+add_shortcode('jg_send_suggestion_shortcode', 'jg_send_form_suggestion');
+
+
+//Custom Post Type
+
 function create_post_type_suggestions() {
     //Etiquetas para el Post Type
     $labels = array(
@@ -44,6 +107,8 @@ function create_post_type_suggestions() {
         'has_archive'        => true,
         'exclude_from_search'=> false,
         'capability_type'    => 'page',
+        'show_in_rest'       => true,
+        'rest_base'          => 'sugerencias'
         
     );
       
@@ -52,6 +117,8 @@ function create_post_type_suggestions() {
 }
 add_action('init', 'create_post_type_suggestions', 0);
 
+//Custom Fields - Metaboxes
+/*
 function jg_add_metaboxes(){
     add_meta_box('metaboxes', 'Custom fields', 'metaboxes_design', 'sugerencias', 'normal', 'high', null);
 }
@@ -122,10 +189,11 @@ function metaboxes_design($post) {
     </div>
     <?php
 }
-
+*/
 if (!defined('ABSPATH')) exit;
 
-//Categoria Personalizada
+//Categoria Bloques Personalizada
+
 function custom_category($categories, $post) {
     return array_merge(
         $categories,

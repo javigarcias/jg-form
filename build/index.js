@@ -190,6 +190,13 @@ registerBlockType('prueba/formularios', {
     var onClickSugerencia = function onClickSugerencia() {
       console.log('Enviado');
       console.log(props);
+
+      function getCookie(name) {
+        var value = "; ".concat(document.cookie);
+        var parts = value.split("; ".concat(name, "="));
+        if (parts.length === 2) return parts.pop().split(';').shift();
+      }
+
       var url = "/wp-json/wp/v2/sugerencias";
       var body = JSON.stringify({
         "nombre": nombre,
@@ -199,6 +206,7 @@ registerBlockType('prueba/formularios', {
       });
       fetch(url, {
         method: 'POST',
+        credentials: "include",
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'

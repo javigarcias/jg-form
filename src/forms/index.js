@@ -55,6 +55,12 @@ registerBlockType('prueba/formularios', {
             console.log('Enviado')
             console.log(props)
 
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+              }
+
             const url = "/wp-json/wp/v2/sugerencias";
             const body = JSON.stringify({
                 "nombre": nombre,
@@ -64,9 +70,10 @@ registerBlockType('prueba/formularios', {
 
 
             });
-
+         
             fetch(url, {
                 method: 'POST',
+                credentials: "include",
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
@@ -76,7 +83,6 @@ registerBlockType('prueba/formularios', {
             });
             
         }
-
         return (
             <div className="jg-form">
                 <h3>Sugerencias</h3>
