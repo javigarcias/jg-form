@@ -10,6 +10,7 @@
     License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
+
 //Libreria CMB2 para Custom Fields
 
 if ( file_exists (dirname( __FILE__ ) . '/CMB2/init.php')) {
@@ -20,13 +21,13 @@ add_action('cmb2_admin_init', 'forms_imputs');
 
 function forms_imputs() {
     $prefix = 'jg_forms_inputs_';
-
+    
     $metabox_sugerencias = new_cmb2_box(array(
         'id'            => $prefix . 'metabox',
         'title'         => __('Custom fields', 'cmb2'),
         'object_types'  => array('sugerencias')
     ));
-
+    
     $metabox_sugerencias->add_field(array(
         'name'      => __('Nombre', 'cmb2'),
         'desc'      => __('Escribe tu nombre', 'cmb2'),
@@ -51,10 +52,68 @@ function forms_imputs() {
         'id'        => $prefix . 'sugerencia',
         'type'      => 'textarea',
     ));
-
+    
 }
 
-//Imprimir Datos
+//Crear Sugerencia desde Front con Shortcode
+
+function jg_create_suggestion(){
+
+    $cmb = new_cmb2_box(array(
+        'id'           => 'send_suggestion',
+        'object_types' => array('page'),
+        'hookup'       => false,
+        'save_fields'  => false,
+    ));
+    $cmb->add_field( array(
+        'name'  => 'Nombre',
+        'id'    => 'nombre_id',
+        'type'  => 'text'
+    ));
+    $cmb->add_field( array(
+        'name'  => 'Apellidos',
+        'id'    => 'apellidos_id',
+        'type'  => 'text'
+    ));
+    $cmb->add_field( array(
+        'name'  => 'Email',
+        'id'    => 'email_id',
+        'type'  => 'text_email'
+    ));
+    $cmb->add_field( array(
+        'name'  => 'Sugerencia',
+        'id'    => 'sugerencia_id',
+        'type'  => 'textarea'
+    ));
+}
+add_action('cmb2_init', 'jg_create_suggestion');
+
+//Obtiene los valores del formulario
+function jg_suggestion_fields() {
+    //ID del CMB2 box
+    $metabox_id = 'send_suggestion';
+
+    $object_id = 'fake-object-id';
+
+    return cmb2_get_metabox($metabox_id, $object_id);
+}
+
+//Shortcode crear sugerencia > [jg_create_suggestion_shortcode]
+
+function jg_create_form_suggestion() {
+    echo '<h2 class="tex-center">Enviar Sugerencias</h2>';
+    //Obtiene el ID del formulario
+    $cmb = jg_suggestion_fields();
+
+    $output = '';
+
+    $output .= cmb2_get_metabox_form($cmb, 'fake-object-id', array('save_button' => 'Enviar Sugerencia'));
+
+    return $output;
+}
+add_shortcode('jg_create_suggestion_shortcode', 'jg_create_form_suggestion');
+
+//Imprimir Sugerencias
 
 function jg_suggestion($texto) {
     
@@ -77,7 +136,7 @@ function jg_suggestion($texto) {
     echo '</li>';
 }
 
-//Crear shortcode > [jg_send_suggestion_shortcode]
+//Crear shortcode para imprimir sugerencias> [jg_send_suggestion_shortcode]
 
 add_shortcode('jg_send_suggestion_shortcode', 'jg_suggestion');
 
