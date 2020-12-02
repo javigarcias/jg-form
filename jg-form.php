@@ -57,18 +57,29 @@ function forms_imputs() {
 //Imprimir Datos
 
 function jg_suggestion($texto) {
+    
     $args =array(
         'post_type'     => 'sugerencias',
-        'order'         => 'ASC',
+        'order'         => 'DESC',
         'post_per_page' => -1,
+        
     );
+    echo '<h2 class="tex-center">Sugerencias</h2>';
+
+    echo '<ul id="sugerencias">'; 
+    $sugerencias = new WP_Query($args); while($sugerencias->have_posts()): $sugerencias->the_post();
+    echo '<li>';
+    echo '<p><b>Nombre: </b>' . get_post_meta(get_the_ID(),'jg_forms_inputs_nombre', true);
+    echo '<p><b>Apellidos: </b>' . get_post_meta(get_the_ID(),'jg_forms_inputs_apellidos', true);
+    echo '<p><b>Email: </b>' . get_post_meta(get_the_ID(),'jg_forms_inputs_email', true);
+    echo '<p><b>Sugerencia: </b>' . get_post_meta(get_the_ID(),'jg_forms_inputs_sugerencia', true);
+    endwhile; wp_reset_postdata();
+    echo '</li>';
 }
 
 //Crear shortcode > [jg_send_suggestion_shortcode]
-function jg_send_form_suggestion() {
-    echo "Holaaaa desde shortcode";
-}
-add_shortcode('jg_send_suggestion_shortcode', 'jg_send_form_suggestion');
+
+add_shortcode('jg_send_suggestion_shortcode', 'jg_suggestion');
 
 
 //Custom Post Type
