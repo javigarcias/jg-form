@@ -101,17 +101,71 @@ function jg_suggestion_fields() {
 //Shortcode crear sugerencia > [jg_create_suggestion_shortcode]
 
 function jg_create_form_suggestion() {
-    echo '<h2 class="tex-center">Enviar Sugerencias</h2>';
+    echo '<h2 class="tex-center">Enviar Sugerencia</h2>';
     //Obtiene el ID del formulario
     $cmb = jg_suggestion_fields();
 
     $output = '';
+
+    //Tratamiento de errores
+    if( ( $error = $cmb->prop('submission_error')) && is_wp_error($error)) {
+        $output .= '<h3' . sprintf( __('Hubo un error: %s ', 'jg_form'), '<strong>' . $error->get_error_message() . '</strong>' ) . '</h3>';
+    }
+
+    //Notificación usuario si todo es correcto
+    if( isset($_GET['post_submited']) && ($post = get_post( absint($_GET['post_submited'])))){
+        //Obtener nombre de usuario
+        $nombre = get_post_meta($post->ID, 'nombre_id', 1);
+        $nombre = $nombre ? " " . $nombre : '';
+        $output .= '<h3>' . sprintf( __('Gracias %s por tu sugerencia ', 'jg_form'), esc_html($nombre) ) . '</h3>';
+
+    }
 
     $output .= cmb2_get_metabox_form($cmb, 'fake-object-id', array('save_button' => 'Enviar Sugerencia'));
 
     return $output;
 }
 add_shortcode('jg_create_suggestion_shortcode', 'jg_create_form_suggestion');
+
+function jg_insert_suggestion() {
+    //En caso de ue no se envie un formulario, no ejecuta
+    if(empty($_POST) || !isset( $_POST['submit-cmb'], $_POST['ogject_id'])) {
+        return false;
+    }
+
+    //Obtiene los valores del formulario
+    $cmb = jg_suggestion_fields();
+
+    $post_data = array();
+
+    //Revisar nonce de seguridad
+    if( !isset($_POST[ $cmb->nonce()]) || !wp_verify_nonce($_POST[ $cmb->nonce()], $cmb->nonce() )) {
+        return $cmb->prop('submission_error', new WP_Error('security_fail', 'Fallo de seguridad.'));
+    }
+
+    if(empty($_POST[nombre_id])){
+        return $cmb->prop('submission_error', new WP_Error('post_data_missing', 'Falta tu nombre'));
+    }
+
+    //Sanitizar datos
+    $valores_sanitizados = $cmb->get_sanitized_values($_POST);
+    
+    $post_data['meta_input'] = array(
+        'jg_forms_inputs_nombre' => $valores_sanitizados[nombre_id],
+        'jg_forms_inputs_apellidos' => $valores_sanitizados[apellidos_id],
+        'jg_forms_inputs_email' => $valores_sanitizados[email_id],
+        'jg_forms_inputs_sugerencia' => $valores_sanitizados[sugerencia_id],
+
+    );
+
+    $post_data['post_type'] = 'sugerencias';
+
+    $nuevo_post = wp_insert_post($post_data, true);
+    
+    $cmb->save_fields($nuevo_post, 'post', $valores_sanitizados);
+
+}
+add_action('cmb2_after_init', 'jg_insert_suggestion');
 
 //Imprimir Sugerencias
 
